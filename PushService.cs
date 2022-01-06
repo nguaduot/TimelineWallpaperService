@@ -69,6 +69,8 @@ namespace TimelineWallpaperService {
                     done = await LoadPixivel();
                 } else if (LofterIni.GetId().Equals(ini.PushProvider)) {
                     done = await LoadLofter();
+                } else if (AbyssIni.GetId().Equals(ini.PushProvider)) {
+                    done = await LoadAbyss();
                 } else if (DaihanIni.GetId().Equals(ini.PushProvider)) {
                     done = await LoadDaihan();
                 } else if (DmoeIni.GetId().Equals(ini.PushProvider)) {
@@ -351,6 +353,20 @@ namespace TimelineWallpaperService {
             }
             string urlUhd = urls[new Random().Next(urls.Count)];
             Log.Information("PushService.LoadLofter() img url: " + urlUhd);
+            return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(), 0);
+        }
+
+        private async Task<bool> LoadAbyss() {
+            const string URL_API = "https://wall.alphacoders.com/popular.php";
+            Log.Information("PushService.LoadAbyss() api url: " + URL_API);
+            HttpClient client = new HttpClient();
+            string htmlData = await client.GetStringAsync(URL_API);
+            List<string> urls = new List<string>();
+            foreach (Match m in Regex.Matches(htmlData, @"src=[""']([^""]+thumbbig-\d+\.[^""']+)[""']")) {
+                urls.Add(m.Groups[1].Value);
+            }
+            string urlUhd = urls[new Random().Next(urls.Count)].Replace("thumbbig-", "");
+            Log.Information("PushService.LoadAbyss() img url: " + urlUhd);
             return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(), 0);
         }
 

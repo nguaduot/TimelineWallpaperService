@@ -5,8 +5,8 @@ namespace TimelineWallpaperService.Utils {
         private readonly HashSet<string> PROVIDER = new HashSet<string>() {
             BingIni.GetId(), NasaIni.GetId(), OneplusIni.GetId(), TimelineIni.GetId(), Himawari8Ini.GetId(),
             YmyouliIni.GetId(), InfinityIni.GetId(), G3Ini.GetId(), PixivelIni.GetId(), LofterIni.GetId(),
-            DaihanIni.GetId(), DmoeIni.GetId(), ToubiecIni.GetId(), MtyIni.GetId(), SeovxIni.GetId(),
-            PaulIni.GetId()
+            AbyssIni.GetId(), DaihanIni.GetId(), DmoeIni.GetId(), ToubiecIni.GetId(), MtyIni.GetId(),
+            SeovxIni.GetId(), PaulIni.GetId()
         };
         private readonly HashSet<string> PUSH = new HashSet<string>() { "", "desktop", "lock" };
         private readonly HashSet<string> THEME = new HashSet<string>() { "", "light", "dark" };
@@ -55,6 +55,8 @@ namespace TimelineWallpaperService.Utils {
 
         public LofterIni Lofter { set; get; } = new LofterIni();
 
+        public AbyssIni Abyss { set; get; } = new AbyssIni();
+
         public DaihanIni Daihan { set; get; } = new DaihanIni();
 
         public DmoeIni Dmoe { set; get; } = new DmoeIni();
@@ -86,6 +88,8 @@ namespace TimelineWallpaperService.Utils {
                 return Pixivel.PushPeriod;
             } else if (LofterIni.GetId().Equals(provider)) {
                 return Lofter.PushPeriod;
+            } else if (AbyssIni.GetId().Equals(provider)) {
+                return Abyss.PushPeriod;
             } else if (DaihanIni.GetId().Equals(provider)) {
                 return Daihan.PushPeriod;
             } else if (DmoeIni.GetId().Equals(provider)) {
@@ -125,6 +129,8 @@ namespace TimelineWallpaperService.Utils {
                 paras = Pixivel.ToString();
             } else if (LofterIni.GetId().Equals(provider)) {
                 paras = Lofter.ToString();
+            } else if (AbyssIni.GetId().Equals(provider)) {
+                paras = Abyss.ToString();
             } else if (DaihanIni.GetId().Equals(provider)) {
                 paras = Daihan.ToString();
             } else if (DmoeIni.GetId().Equals(provider)) {
@@ -135,8 +141,6 @@ namespace TimelineWallpaperService.Utils {
                 paras = Mty.ToString();
             } else if (SeovxIni.GetId().Equals(provider)) {
                 paras = Seovx.ToString();
-            //} else if (MxgIni.GetId().Equals(provider)) {
-            //    paras = Mxg.ToString();
             } else if (PaulIni.GetId().Equals(provider)) {
                 paras = Paul.ToString();
             } else if (BingIni.GetId().Equals(provider)) {
@@ -436,6 +440,18 @@ namespace TimelineWallpaperService.Utils {
         override public string ToString() => $"pushperiod={PushPeriod}";
 
         public static string GetId() => "lofter";
+    }
+
+    public sealed class AbyssIni {
+        private int pushPeriod = 24;
+        public int PushPeriod {
+            set => pushPeriod = value <= 0 || value > 24 ? 24 : value;
+            get => pushPeriod;
+        }
+
+        override public string ToString() => $"pushperiod={PushPeriod}";
+
+        public static string GetId() => "abyss";
     }
 
     public sealed class DaihanIni {

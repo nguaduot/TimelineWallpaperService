@@ -4,22 +4,28 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Text;
+using System.Threading.Tasks;
 using TimelineWallpaperService.Beans;
 using TimelineWallpaperService.Utils;
+using Windows.Foundation;
 using Windows.System.Profile;
 using Windows.System.UserProfile;
 
 namespace TimelineWallpaperService.Services {
     public sealed class ApiService {
-        public static async void Stats(Ini ini, bool status) {
+        public static IAsyncOperation<bool> Stats(Ini ini, bool status) {
+            return Stats_Impl(ini, status).AsAsyncOperation();
+        }
+
+        private static async Task<bool> Stats_Impl(Ini ini, bool status) {
             if (!NetworkInterface.GetIsNetworkAvailable()) {
-                return;
+                return false;
             }
             const string URL_API_STATS = "https://api.nguaduot.cn/appstats";
             StatsApiReq req = new StatsApiReq {
                 App = "拾光推送服务",
                 Package = "TWPushService.winmd",
-                Version = "3.1", // TODO
+                Version = "3.3", // TODO
                 Api = ini?.ToString(),
                 Status = status ? 1 : 0,
                 Os = AnalyticsInfo.VersionInfo.DeviceFamily,
@@ -37,9 +43,11 @@ namespace TimelineWallpaperService.Services {
                 _ = response.EnsureSuccessStatusCode();
                 string jsonData = await response.Content.ReadAsStringAsync();
                 Debug.WriteLine("stats2: " + jsonData.Trim());
+                return jsonData.Contains(@"""status"":1");
             } catch (Exception e) {
                 Debug.WriteLine(e);
             }
+            return false;
         }
     }
 }

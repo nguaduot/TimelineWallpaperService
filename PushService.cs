@@ -27,21 +27,19 @@ namespace TimelineWallpaperService {
     public sealed class PushService : IBackgroundTask {
         private ApplicationDataContainer localSettings;
         private Ini ini;
-        private int pushPeriod = 24;
-        private string pushTag; // 免重复推送标记
+        private int desktopPeriod = 24;
+        private int lockPeriod = 24;
+        private string desktopTag; // 免重复推送桌面背景标记
+        private string lockTag; // 免重复推送锁屏背景标记
         private bool pushNow = false; // 立即运行一次
 
         public async void Run(IBackgroundTaskInstance taskInstance) {
             Init(taskInstance);
             Log.Information("PushService.Run() trigger: " + taskInstance.TriggerDetails);
-            Log.Information("PushService.Run() pushProvider: " + ini.PushProvider);
-            Log.Information("PushService.Run() push: " + ini.Push);
-            Log.Information("PushService.Run() pushPeriod: " + pushPeriod);
-
-            if (!CheckNecessary()) {
-                Log.Information("PushService.Run() skip pushTag: " + pushTag);
-                return;
-            }
+            Log.Information("PushService.Run() desktopProvider: " + ini.DesktopProvider);
+            Log.Information("PushService.Run() lockProvider: " + ini.LockProvider);
+            Log.Information("PushService.Run() desktopPeriod: " + desktopPeriod);
+            Log.Information("PushService.Run() lockPeriod: " + lockPeriod);
             // 检查网络连接
             if (!NetworkInterface.GetIsNetworkAvailable()) {
                 Log.Warning("PushService.Run() network not available");
@@ -50,48 +48,98 @@ namespace TimelineWallpaperService {
 
             BackgroundTaskDeferral deferral = taskInstance.GetDeferral();
             try {
-                bool done = false;
-                if (NasaIni.GetId().Equals(ini.PushProvider)) {
-                    done = await LoadNasa();
-                } else if (OneplusIni.GetId().Equals(ini.PushProvider)) {
-                    done = await LoadOneplus();
-                } else if (TimelineIni.GetId().Equals(ini.PushProvider)) {
-                    done = await LoadTimeline();
-                } else if (YmyouliIni.GetId().Equals(ini.PushProvider)) {
-                    done = await LoadYmyouli();
-                } else if (InfinityIni.GetId().Equals(ini.PushProvider)) {
-                    done = await LoadInfinity();
-                } else if (Himawari8Ini.GetId().Equals(ini.PushProvider)) {
-                    done = await LoadHimawari8();
-                } else if (G3Ini.GetId().Equals(ini.PushProvider)) {
-                    done = await Load3G();
-                } else if (PixivelIni.GetId().Equals(ini.PushProvider)) {
-                    done = await LoadPixivel();
-                } else if (LofterIni.GetId().Equals(ini.PushProvider)) {
-                    done = await LoadLofter();
-                } else if (AbyssIni.GetId().Equals(ini.PushProvider)) {
-                    done = await LoadAbyss();
-                } else if (DaihanIni.GetId().Equals(ini.PushProvider)) {
-                    done = await LoadDaihan();
-                } else if (DmoeIni.GetId().Equals(ini.PushProvider)) {
-                    done = await LoadDmoe();
-                } else if (ToubiecIni.GetId().Equals(ini.PushProvider)) {
-                    done = await LoadToubiec();
-                } else if (MtyIni.GetId().Equals(ini.PushProvider)) {
-                    done = await LoadMty();
-                } else if (SeovxIni.GetId().Equals(ini.PushProvider)) {
-                    done = await LoadSeovx();
-                } else if (PaulIni.GetId().Equals(ini.PushProvider)) {
-                    done = await LoadPaul();
-                } else if (BingIni.GetId().Equals(ini.PushProvider)) {
-                    done = await LoadBing();
+                bool stats = false;
+                if (CheckDesktopNecessary()) {
+                    bool done = false;
+                    if (BingIni.GetId().Equals(ini.DesktopProvider)) {
+                        done = await LoadBing(true);
+                    } else if (NasaIni.GetId().Equals(ini.DesktopProvider)) {
+                        done = await LoadNasa(true);
+                    } else if (OneplusIni.GetId().Equals(ini.DesktopProvider)) {
+                        done = await LoadOneplus(true);
+                    } else if (TimelineIni.GetId().Equals(ini.DesktopProvider)) {
+                        done = await LoadTimeline(true);
+                    } else if (YmyouliIni.GetId().Equals(ini.DesktopProvider)) {
+                        done = await LoadYmyouli(true);
+                    } else if (InfinityIni.GetId().Equals(ini.DesktopProvider)) {
+                        done = await LoadInfinity(true);
+                    } else if (Himawari8Ini.GetId().Equals(ini.DesktopProvider)) {
+                        done = await LoadHimawari8(true);
+                    } else if (G3Ini.GetId().Equals(ini.DesktopProvider)) {
+                        done = await Load3G(true);
+                    } else if (BoboIni.GetId().Equals(ini.DesktopProvider)) {
+                        done = await LoadBobo(true);
+                    } else if (LofterIni.GetId().Equals(ini.DesktopProvider)) {
+                        done = await LoadLofter(true);
+                    } else if (AbyssIni.GetId().Equals(ini.DesktopProvider)) {
+                        done = await LoadAbyss(true);
+                    } else if (DaihanIni.GetId().Equals(ini.DesktopProvider)) {
+                        done = await LoadDaihan(true);
+                    } else if (DmoeIni.GetId().Equals(ini.DesktopProvider)) {
+                        done = await LoadDmoe(true);
+                    } else if (ToubiecIni.GetId().Equals(ini.DesktopProvider)) {
+                        done = await LoadToubiec(true);
+                    } else if (MtyIni.GetId().Equals(ini.DesktopProvider)) {
+                        done = await LoadMty(true);
+                    } else if (SeovxIni.GetId().Equals(ini.DesktopProvider)) {
+                        done = await LoadSeovx(true);
+                    } else if (PaulIni.GetId().Equals(ini.DesktopProvider)) {
+                        done = await LoadPaul(true);
+                    }
+                    if (done) {
+                        localSettings.Values[desktopTag] = (int)localSettings.Values[desktopTag] + 1;
+                        stats = true;
+                    }
                 } else {
-                    done = await LoadBing();
+                    Log.Information("PushService.Run() skip desktopTag: " + desktopPeriod);
                 }
-                if (done) {
-                    localSettings.Values[pushTag] = (int)localSettings.Values[pushTag] + 1;
+                if (CheckLockNecessary()) {
+                    bool done = false;
+                    if (BingIni.GetId().Equals(ini.LockProvider)) {
+                        done = await LoadBing(false);
+                    } else if (NasaIni.GetId().Equals(ini.LockProvider)) {
+                        done = await LoadNasa(false);
+                    } else if (OneplusIni.GetId().Equals(ini.LockProvider)) {
+                        done = await LoadOneplus(false);
+                    } else if (TimelineIni.GetId().Equals(ini.LockProvider)) {
+                        done = await LoadTimeline(false);
+                    } else if (YmyouliIni.GetId().Equals(ini.LockProvider)) {
+                        done = await LoadYmyouli(false);
+                    } else if (InfinityIni.GetId().Equals(ini.LockProvider)) {
+                        done = await LoadInfinity(false);
+                    } else if (Himawari8Ini.GetId().Equals(ini.LockProvider)) {
+                        done = await LoadHimawari8(false);
+                    } else if (G3Ini.GetId().Equals(ini.LockProvider)) {
+                        done = await Load3G(false);
+                    } else if (BoboIni.GetId().Equals(ini.LockProvider)) {
+                        done = await LoadBobo(false);
+                    } else if (LofterIni.GetId().Equals(ini.LockProvider)) {
+                        done = await LoadLofter(false);
+                    } else if (AbyssIni.GetId().Equals(ini.LockProvider)) {
+                        done = await LoadAbyss(false);
+                    } else if (DaihanIni.GetId().Equals(ini.LockProvider)) {
+                        done = await LoadDaihan(false);
+                    } else if (DmoeIni.GetId().Equals(ini.LockProvider)) {
+                        done = await LoadDmoe(false);
+                    } else if (ToubiecIni.GetId().Equals(ini.LockProvider)) {
+                        done = await LoadToubiec(false);
+                    } else if (MtyIni.GetId().Equals(ini.LockProvider)) {
+                        done = await LoadMty(false);
+                    } else if (SeovxIni.GetId().Equals(ini.LockProvider)) {
+                        done = await LoadSeovx(false);
+                    } else if (PaulIni.GetId().Equals(ini.LockProvider)) {
+                        done = await LoadPaul(false);
+                    }
+                    if (done) {
+                        localSettings.Values[lockTag] = (int)localSettings.Values[lockTag] + 1;
+                        stats = true;
+                    }
+                } else {
+                    Log.Information("PushService.Run() skip lockTag: " + desktopPeriod);
                 }
-                ApiService.Stats(ini, done);
+                if (stats) {
+                    _ = await ApiService.Stats(ini, true);
+                }
             } catch (Exception e) {
                 Log.Error("PushService.Run() " + e.GetType().Name);
             } finally {
@@ -102,14 +150,20 @@ namespace TimelineWallpaperService {
         private void Init(IBackgroundTaskInstance taskInstance) {
             pushNow = taskInstance.TriggerDetails is ApplicationTriggerDetails;
             ini = IniUtil.GetIni();
-            pushPeriod = ini.GetPushPeriod(ini.PushProvider);
-            pushTag = string.Format("{0}{1}-{2}-{3}", DateTime.Now.ToString("yyyyMMdd"),
-                DateTime.Now.Hour / pushPeriod, ini.PushProvider, ini.Push);
+            desktopPeriod = ini.GetDesktopPeriod(ini.DesktopProvider);
+            lockPeriod = ini.GetLockPeriod(ini.LockProvider);
+            desktopTag = string.Format("{0}{1}-{2}", DateTime.Now.ToString("yyyyMMdd"),
+                DateTime.Now.Hour / desktopPeriod, ini.DesktopProvider);
+            lockTag = string.Format("{0}{1}-{2}", DateTime.Now.ToString("yyyyMMdd"),
+                DateTime.Now.Hour / lockPeriod, ini.LockProvider);
 
             if (localSettings == null) {
                 localSettings = ApplicationData.Current.LocalSettings;
-                if (!localSettings.Values.ContainsKey(pushTag)) {
-                    localSettings.Values[pushTag] = 0;
+                if (!localSettings.Values.ContainsKey(desktopTag)) {
+                    localSettings.Values[desktopTag] = 0;
+                }
+                if (!localSettings.Values.ContainsKey(lockTag)) {
+                    localSettings.Values[lockTag] = 0;
                 }
 
                 string logFile = Path.Combine(ApplicationData.Current.LocalFolder.Path, "log.txt");
@@ -120,7 +174,7 @@ namespace TimelineWallpaperService {
             }
         }
 
-        private bool CheckNecessary() {
+        private bool CheckDesktopNecessary() {
             if (!UserProfilePersonalizationSettings.IsSupported()) {
                 Log.Information("PushService.CheckNecessary() UserProfilePersonalizationSettings false");
                 return false;
@@ -128,10 +182,24 @@ namespace TimelineWallpaperService {
             if (pushNow) { // 立即运行一次
                 return true;
             }
-            if (string.IsNullOrEmpty(ini.Push)) { // 未开启推送
+            if (string.IsNullOrEmpty(ini.DesktopProvider)) { // 未开启推送
                 return false;
             }
-            return (int)localSettings.Values[pushTag] == 0;
+            return (int)localSettings.Values[desktopTag] == 0;
+        }
+
+        private bool CheckLockNecessary() {
+            if (!UserProfilePersonalizationSettings.IsSupported()) {
+                Log.Information("PushService.CheckNecessary() UserProfilePersonalizationSettings false");
+                return false;
+            }
+            if (pushNow) { // 立即运行一次
+                return true;
+            }
+            if (string.IsNullOrEmpty(ini.LockProvider)) { // 未开启推送
+                return false;
+            }
+            return (int)localSettings.Values[lockTag] == 0;
         }
 
         private async Task<bool> SetWallpaper(string urlImg, bool setDesktopOrLock, Size resize, float offset) {
@@ -175,7 +243,7 @@ namespace TimelineWallpaperService {
                 : await profileSettings.TrySetLockScreenImageAsync(fileWallpaper);
         }
 
-        private async Task<bool> LoadBing() {
+        private async Task<bool> LoadBing(bool setDesktopOrLock) {
             const string URL_API_HOST = "https://global.bing.com";
             const string URL_API = URL_API_HOST + "/HPImageArchive.aspx?pid=hp&format=js&uhd=1&idx=0&n=1";
             Log.Information("PushService.LoadBing() api url: " + URL_API);
@@ -184,10 +252,10 @@ namespace TimelineWallpaperService {
             BingApi bing = JsonConvert.DeserializeObject<BingApi>(jsonData);
             string urlUhd = string.Format("{0}{1}_UHD.jpg", URL_API_HOST, bing.Images[0].UrlBase);
             Log.Information("PushService.LoadBing() img url: " + urlUhd);
-            return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(), 0);
+            return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
 
-        private async Task<bool> LoadNasa() {
+        private async Task<bool> LoadNasa(bool setDesktopOrLock) {
             string urlApi = string.Format("https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&thumbs=True&start_date={0}&end_date={1}",
                 DateTime.UtcNow.AddHours(-4).AddDays(-6).ToString("yyyy-MM-dd"), DateTime.UtcNow.AddHours(-4).ToString("yyyy-MM-dd"));
             Log.Information("PushService.LoadNasa() api url: " + urlApi);
@@ -202,10 +270,10 @@ namespace TimelineWallpaperService {
                 }
             }
             Log.Information("PushService.LoadBing() img url: " + urlUhd);
-            return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(), 0);
+            return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
 
-        private async Task<bool> LoadOneplus() {
+        private async Task<bool> LoadOneplus(bool setDesktopOrLock) {
             OneplusRequest request = new OneplusRequest {
                 PageSize = 1,
                 CurrentPage = 1,
@@ -223,22 +291,22 @@ namespace TimelineWallpaperService {
             OneplusApi oneplusApi = JsonConvert.DeserializeObject<OneplusApi>(jsonData);
             string urlUhd = oneplusApi.Items[0].PhotoUrl;
             Log.Information("PushService.LoadBing() img url: " + urlUhd);
-            return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(), 0);
+            return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
 
-        private async Task<bool> LoadTimeline() {
-            const string URL_API = "https://api.nguaduot.cn/timeline?client=timelinewallpaper&cate={0}&order={1}";
-            string urlApi = string.Format(URL_API, ini.Timeline.Cate, ini.Timeline.Order);
+        private async Task<bool> LoadTimeline(bool setDesktopOrLock) {
+            const string URL_API = "https://api.nguaduot.cn/timeline?client=timelinewallpaper&cate={0}&order={1}&authorize={2}";
+            string urlApi = string.Format(URL_API, ini.Timeline.Cate, ini.Timeline.Order, ini.Timeline.Authorize);
             Log.Information("PushService.LoadTimeline() api url: " + urlApi);
             HttpClient client = new HttpClient();
             string jsonData = await client.GetStringAsync(urlApi);
             Match match = Regex.Match(jsonData, @"""imgurl"": ?""(.+?)""");
             string urlUhd = match.Groups[1].Value;
             Log.Information("PushService.LoadTimeline() img url: " + urlUhd);
-            return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(), 0);
+            return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
 
-        private async Task<bool> LoadYmyouli() {
+        private async Task<bool> LoadYmyouli(bool setDesktopOrLock) {
             const string URL_UHD = "https://27146103.s21i.faiusr.com/2/{0}";
             const string URL_API = "https://www.ymyouli.com/ajax/ajaxLoadModuleDom_h.jsp";
             List<string> cols = Enumerable.ToList(YmyouliIni.GetDic().Keys);
@@ -268,10 +336,10 @@ namespace TimelineWallpaperService {
             }
             string urlUhd = urls[new Random().Next(urls.Count)];
             Log.Information("PushService.LoadYmyouli() img url: " + urlUhd);
-            return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(), 0);
+            return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
 
-        private async Task<bool> LoadInfinity() {
+        private async Task<bool> LoadInfinity(bool setDesktopOrLock) {
             const string URL_API = "https://infinity-api.infinitynewtab.com/random-wallpaper?_={0}";
             string urlApi = string.Format(URL_API,
                 (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds);
@@ -281,11 +349,11 @@ namespace TimelineWallpaperService {
             Match match = Regex.Match(jsonData, @"""rawSrc"": ?""(.+?)""");
             string urlUhd = match.Groups[1].Value;
             Log.Information("PushService.LoadInfinity() img url: " + urlUhd);
-            return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(), 0);
+            return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
 
-        private async Task<bool> LoadHimawari8() {
-            const string URL_API = "https://himawari8.nict.go.jp/img/D531106/1d/550/{0}/{1}_0_0.png";
+        private async Task<bool> LoadHimawari8(bool setDesktopOrLock) {
+            const string URL_API = "https://himawari8.nict.go.jp/img/D531106/thumbnail/550/{0}/{1}_0_0.png";
             DateTime now = DateTime.UtcNow.AddMinutes(-15);
             now = now.AddMinutes(-now.Minute % 10);
             string urlUhd = null;
@@ -304,10 +372,10 @@ namespace TimelineWallpaperService {
                 res.Close();
             }
             Log.Information("PushService.LoadHimawari8() img url: " + urlUhd);
-            return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(1920, 1080), ini.Himawari8.Offset);
+            return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(1920, 1080), ini.Himawari8.Offset);
         }
 
-        private async Task<bool> Load3G() {
+        private async Task<bool> Load3G(bool setDesktopOrLock) {
             const string URL_API = "https://desk.3gbizhi.com/index_1.html";
             Log.Information("PushService.Load3G() api url: " + URL_API);
             HttpClient client = new HttpClient();
@@ -318,29 +386,26 @@ namespace TimelineWallpaperService {
             }
             string urlUhd = urls[new Random().Next(urls.Count)];
             Log.Information("PushService.Load3G() img url: " + urlUhd);
-            return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(), 0);
+            return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
 
-        private async Task<bool> LoadPixivel() {
-            const string URL_HOST_PROXY = "https://i.pixiv.re";
-            const string URL_API = "https://api.pixivel.moe/pixiv?type=illust_recommended";
-            Log.Information("PushService.LoadPixivel() api url: " + URL_API);
+        private async Task<bool> LoadBobo(bool setDesktopOrLock) {
+            const string URL_API = "https://bobopic.com/category/4k/page/{0}";
+            const string URL_UHD = "https://dl.bobopic.com/tu/{0}{1}";
+            string urlApi = string.Format(URL_API, new Random().Next(1, 40));
+            Log.Information("PushService.LoadBobo() api url: " + urlApi);
             HttpClient client = new HttpClient();
-            string jsonData = await client.GetStringAsync(URL_API);
+            string htmlData = await client.GetStringAsync(urlApi);
             List<string> urls = new List<string>();
-            foreach (Match m in Regex.Matches(jsonData, @"""original_image_url"": ?""(.+?)""")) {
-                urls.Add(m.Groups[1].Value);
-            }
-            foreach (Match m in Regex.Matches(jsonData, @"""original"": ?""(.+?)""")) {
-                urls.Add(m.Groups[1].Value);
+            foreach (Match m in Regex.Matches(htmlData, @"srcset=""([^""]+/small/(\d+)(\.[^""]+))""")) {
+                urls.Add(string.Format(URL_UHD, m.Groups[2].Value, m.Groups[3].Value));
             }
             string urlUhd = urls[new Random().Next(urls.Count)];
-            urlUhd = URL_HOST_PROXY + new Uri(urlUhd).AbsolutePath; // 替换国内代理
-            Log.Information("PushService.LoadPixivel() img url: " + urlUhd);
-            return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(), 0);
+            Log.Information("PushService.LoadBobo() img url: " + urlUhd);
+            return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
 
-        private async Task<bool> LoadLofter() {
+        private async Task<bool> LoadLofter(bool setDesktopOrLock) {
             const string URL_API = "https://www.lofter.com/front/login";
             Log.Information("PushService.LoadLofter() api url: " + URL_API);
             HttpClient client = new HttpClient();
@@ -353,10 +418,10 @@ namespace TimelineWallpaperService {
             }
             string urlUhd = urls[new Random().Next(urls.Count)];
             Log.Information("PushService.LoadLofter() img url: " + urlUhd);
-            return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(), 0);
+            return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
 
-        private async Task<bool> LoadAbyss() {
+        private async Task<bool> LoadAbyss(bool setDesktopOrLock) {
             const string URL_API = "https://wall.alphacoders.com/popular.php";
             Log.Information("PushService.LoadAbyss() api url: " + URL_API);
             HttpClient client = new HttpClient();
@@ -367,10 +432,10 @@ namespace TimelineWallpaperService {
             }
             string urlUhd = urls[new Random().Next(urls.Count)].Replace("thumbbig-", "");
             Log.Information("PushService.LoadAbyss() img url: " + urlUhd);
-            return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(), 0);
+            return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
 
-        private async Task<bool> LoadDaihan() {
+        private async Task<bool> LoadDaihan(bool setDesktopOrLock) {
             const string URL_API = "https://api.daihan.top/api/acg/index.php";
             Log.Information("PushService.LoadDaihan() api url: " + URL_API);
             HttpClient client = new HttpClient(new HttpClientHandler {
@@ -380,10 +445,10 @@ namespace TimelineWallpaperService {
             string urlUhd = msg.Headers.Location.AbsoluteUri;
             urlUhd = Regex.Replace(urlUhd, @"(?<=\.sinaimg\.cn/)[^/]+", "large");
             Log.Information("PushService.LoadDaihan() img url: " + urlUhd);
-            return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(), 0);
+            return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
 
-        private async Task<bool> LoadDmoe() {
+        private async Task<bool> LoadDmoe(bool setDesktopOrLock) {
             const string URL_API = "https://www.dmoe.cc/random.php?return=json";
             Log.Information("PushService.LoadDmoe() api url: " + URL_API);
             HttpClient client = new HttpClient();
@@ -392,10 +457,10 @@ namespace TimelineWallpaperService {
             string urlUhd = Regex.Unescape(match.Groups[1].Value);
             urlUhd = Regex.Replace(urlUhd, @"(?<=\.sinaimg\.cn/)[^/]+", "large");
             Log.Information("PushService.LoadDmoe() img url: " + urlUhd);
-            return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(), 0);
+            return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
 
-        private async Task<bool> LoadToubiec() {
+        private async Task<bool> LoadToubiec(bool setDesktopOrLock) {
             const string URL_API = "https://acg.toubiec.cn/random.php?ret=json";
             Log.Information("PushService.LoadToubiec() api url: " + URL_API);
             HttpClient client = new HttpClient();
@@ -404,10 +469,10 @@ namespace TimelineWallpaperService {
             string urlUhd = match.Groups[1].Value;
             urlUhd = Regex.Replace(urlUhd, @"(?<=\.sinaimg\.cn/)[^/]+", "large");
             Log.Information("PushService.LoadToubiec() img url: " + urlUhd);
-            return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(), 0);
+            return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
 
-        private async Task<bool> LoadMty() {
+        private async Task<bool> LoadMty(bool setDesktopOrLock) {
             const string URL_API = "https://api.mtyqx.cn/api/random.php?return=json";
             Log.Information("PushService.LoadMty() api url: " + URL_API);
             HttpClient client = new HttpClient();
@@ -416,10 +481,10 @@ namespace TimelineWallpaperService {
             string urlUhd = Regex.Unescape(match.Groups[1].Value);
             urlUhd = Regex.Replace(urlUhd, @"(?<=\.sinaimg\.cn/)[^/]+", "large");
             Log.Information("PushService.LoadMty() img url: " + urlUhd);
-            return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(), 0);
+            return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
 
-        private async Task<bool> LoadSeovx() {
+        private async Task<bool> LoadSeovx(bool setDesktopOrLock) {
             const string URL_API = "https://cdn.seovx.com/{0}/?mom=302";
             string urlApi = string.Format(URL_API, ini.Seovx.Cate);
             Log.Information("PushService.LoadSeovx() api url: " + urlApi);
@@ -432,10 +497,10 @@ namespace TimelineWallpaperService {
                 urlUhd = new Uri("https:" + urlUhd).AbsoluteUri;
             }
             Log.Information("PushService.LoadSeovx() img url: " + urlUhd);
-            return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(), 0);
+            return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
 
-        private async Task<bool> LoadPaul() {
+        private async Task<bool> LoadPaul(bool setDesktopOrLock) {
             const string URL_API = "https://api.paugram.com/wallpaper/?source=gh";
             Log.Information("PushService.LoadPaul() api url: " + URL_API);
             HttpClient client = new HttpClient(new HttpClientHandler {
@@ -444,7 +509,7 @@ namespace TimelineWallpaperService {
             HttpResponseMessage msg = await client.GetAsync(URL_API);
             string urlUhd = msg.Headers.Location.AbsoluteUri;
             Log.Information("PushService.LoadPaul() img url: " + urlUhd);
-            return await SetWallpaper(urlUhd, "desktop".Equals(ini.Push), new Size(), 0);
+            return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
     }
 }

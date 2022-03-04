@@ -276,7 +276,7 @@ namespace TimelineWallpaperService.Utils {
 
     public sealed class TimelineIni {
         private readonly HashSet<string> ORDER = new HashSet<string>() { "date", "random" };
-        private readonly HashSet<string> CATE = new HashSet<string>() { "", "landscape", "portrait", "culture" };
+        private readonly HashSet<string> CATE = new HashSet<string>() { "", "landscape", "portrait", "culture", "term" };
 
         private string order = "date";
         public string Order {

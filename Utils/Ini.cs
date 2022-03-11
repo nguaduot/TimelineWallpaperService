@@ -4,11 +4,10 @@ namespace TimelineWallpaperService.Utils {
     public sealed class Ini {
         private readonly HashSet<string> PROVIDER = new HashSet<string>() {
             BingIni.GetId(), NasaIni.GetId(), OneplusIni.GetId(), TimelineIni.GetId(), Himawari8Ini.GetId(),
-            YmyouliIni.GetId(), InfinityIni.GetId(), G3Ini.GetId(), BoboIni.GetId(), LofterIni.GetId(),
+            YmyouliIni.GetId(), InfinityIni.GetId(), OneIni.GetId(), G3Ini.GetId(), BoboIni.GetId(), LofterIni.GetId(),
             AbyssIni.GetId(), DaihanIni.GetId(), DmoeIni.GetId(), ToubiecIni.GetId(), MtyIni.GetId(),
             SeovxIni.GetId(), PaulIni.GetId()
         };
-        private readonly HashSet<string> PUSH = new HashSet<string>() { "", "desktop", "lock" };
         private readonly HashSet<string> THEME = new HashSet<string>() { "", "light", "dark" };
 
         private string provider = BingIni.GetId();
@@ -16,18 +15,6 @@ namespace TimelineWallpaperService.Utils {
             set => provider = PROVIDER.Contains(value) ? value : BingIni.GetId();
             get => provider;
         }
-
-        //private string push = "";
-        //public string Push {
-        //    set => push = PUSH.Contains(value) ? value : "";
-        //    get => push;
-        //}
-
-        //private string pushProvider = BingIni.GetId();
-        //public string PushProvider {
-        //    set => pushProvider = PROVIDER.Contains(value) ? value : BingIni.GetId();
-        //    get => pushProvider;
-        //}
 
         public string DesktopProvider { set; get; }
 
@@ -52,6 +39,8 @@ namespace TimelineWallpaperService.Utils {
         public YmyouliIni Ymyouli { set; get; } = new YmyouliIni();
 
         public InfinityIni Infinity { set; get; } = new InfinityIni();
+
+        public OneIni One { set; get; } = new OneIni();
 
         public G3Ini G3 { set; get; } = new G3Ini();
 
@@ -86,6 +75,8 @@ namespace TimelineWallpaperService.Utils {
                 return Ymyouli.DesktopPeriod;
             } else if (InfinityIni.GetId().Equals(provider)) {
                 return Infinity.DesktopPeriod;
+            } else if (OneIni.GetId().Equals(provider)) {
+                return One.DesktopPeriod;
             } else if (G3Ini.GetId().Equals(provider)) {
                 return G3.DesktopPeriod;
             } else if (BoboIni.GetId().Equals(provider)) {
@@ -126,6 +117,8 @@ namespace TimelineWallpaperService.Utils {
                 return Ymyouli.LockPeriod;
             } else if (InfinityIni.GetId().Equals(provider)) {
                 return Infinity.LockPeriod;
+            } else if (OneIni.GetId().Equals(provider)) {
+                return One.LockPeriod;
             } else if (G3Ini.GetId().Equals(provider)) {
                 return G3.LockPeriod;
             } else if (BoboIni.GetId().Equals(provider)) {
@@ -165,6 +158,8 @@ namespace TimelineWallpaperService.Utils {
                 paras = Ymyouli.ToString();
             } else if (InfinityIni.GetId().Equals(provider)) {
                 paras = Infinity.ToString();
+            } else if (OneIni.GetId().Equals(provider)) {
+                paras = One.ToString();
             } else if (Himawari8Ini.GetId().Equals(provider)) {
                 paras = Himawari8.ToString();
             } else if (G3Ini.GetId().Equals(provider)) {
@@ -483,6 +478,24 @@ namespace TimelineWallpaperService.Utils {
         override public string ToString() => $"desktopperiod={DesktopPeriod}&lockperiod={LockPeriod}&order={Order}";
 
         public static string GetId() => "infinity";
+    }
+
+    public sealed class OneIni {
+        private int desktopPeriod = 24;
+        public int DesktopPeriod {
+            set => desktopPeriod = value <= 0 || value > 24 ? 24 : value;
+            get => desktopPeriod;
+        }
+
+        private int lockPeriod = 24;
+        public int LockPeriod {
+            set => lockPeriod = value <= 0 || value > 24 ? 24 : value;
+            get => lockPeriod;
+        }
+
+        override public string ToString() => $"desktopperiod={DesktopPeriod}&lockperiod={LockPeriod}";
+
+        public static string GetId() => "one";
     }
 
     public sealed class G3Ini {

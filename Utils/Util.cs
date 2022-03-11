@@ -11,7 +11,7 @@ using Windows.System.Profile;
 namespace TimelineWallpaperService.Utils {
     public sealed class IniUtil {
         // TODO: 参数有变动时需调整配置名
-        private const string FILE_INI = "timelinewallpaper-3.3.ini";
+        private const string FILE_INI = "timelinewallpaper-3.8.ini";
 
         [DllImport("kernel32")]
         private static extern int GetPrivateProfileString(string section, string key, string defValue,
@@ -103,6 +103,12 @@ namespace TimelineWallpaperService.Utils {
             _ = GetPrivateProfileString("infinity", "lockperiod", "24", sb, 1024, iniFile);
             _ = int.TryParse(sb.ToString(), out period);
             ini.Infinity.LockPeriod = period;
+            _ = GetPrivateProfileString("one", "desktopperiod", "24", sb, 1024, iniFile);
+            _ = int.TryParse(sb.ToString(), out period);
+            ini.One.DesktopPeriod = period;
+            _ = GetPrivateProfileString("one", "lockperiod", "24", sb, 1024, iniFile);
+            _ = int.TryParse(sb.ToString(), out period);
+            ini.One.LockPeriod = period;
             _ = GetPrivateProfileString("infinity", "order", "", sb, 1024, iniFile);
             ini.Infinity.Order = sb.ToString();
             _ = GetPrivateProfileString("3g", "desktopperiod", "24", sb, 1024, iniFile);

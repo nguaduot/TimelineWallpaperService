@@ -63,6 +63,8 @@ namespace TimelineWallpaperService {
                         done = await LoadYmyouli(true);
                     } else if (InfinityIni.GetId().Equals(ini.DesktopProvider)) {
                         done = await LoadInfinity(true);
+                    } else if (OneIni.GetId().Equals(ini.DesktopProvider)) {
+                        done = await LoadOne(true);
                     } else if (Himawari8Ini.GetId().Equals(ini.DesktopProvider)) {
                         done = await LoadHimawari8(true);
                     } else if (G3Ini.GetId().Equals(ini.DesktopProvider)) {
@@ -107,6 +109,8 @@ namespace TimelineWallpaperService {
                         done = await LoadYmyouli(false);
                     } else if (InfinityIni.GetId().Equals(ini.LockProvider)) {
                         done = await LoadInfinity(false);
+                    } else if (OneIni.GetId().Equals(ini.LockProvider)) {
+                        done = await LoadOne(false);
                     } else if (Himawari8Ini.GetId().Equals(ini.LockProvider)) {
                         done = await LoadHimawari8(false);
                     } else if (G3Ini.GetId().Equals(ini.LockProvider)) {
@@ -373,6 +377,23 @@ namespace TimelineWallpaperService {
             }
             Log.Information("PushService.LoadHimawari8() img url: " + urlUhd);
             return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(1920, 1080), ini.Himawari8.Offset);
+        }
+
+        private async Task<bool> LoadOne(bool setDesktopOrLock) {
+            const string URL_TOKEN = "http://m.wufazhuce.com/one";
+            const string URL_API = "http://m.wufazhuce.com/one/ajaxlist/{0}?_token={1}";
+            HttpClient client = new HttpClient();
+            HttpResponseMessage msg = await client.GetAsync(URL_TOKEN);
+            string htmlData = await msg.Content.ReadAsStringAsync();
+            Match match = Regex.Match(htmlData, @"One.token ?= ?[""'](.+?)[""']");
+            string token = match.Groups[1].Value;
+            string urlApi = string.Format(URL_API, 0, token);
+            Log.Information("PushService.LoadOne() api url: " + urlApi);
+            string jsonData = await client.GetStringAsync(urlApi);
+            match = Regex.Match(jsonData, @"""img_url"": ?""(.+?)""");
+            string urlUhd = Regex.Unescape(match.Groups[1].Value); // 反转义
+            Log.Information("PushService.LoadOne() img url: " + urlUhd);
+            return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
 
         private async Task<bool> Load3G(bool setDesktopOrLock) {

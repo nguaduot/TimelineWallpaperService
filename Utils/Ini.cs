@@ -481,6 +481,14 @@ namespace TimelineWallpaperService.Utils {
     }
 
     public sealed class OneIni {
+        private readonly HashSet<string> ORDER = new HashSet<string>() { "date", "random" };
+
+        private string order = "date";
+        public string Order {
+            set => order = ORDER.Contains(value) ? value : "date";
+            get => order;
+        }
+
         private int desktopPeriod = 24;
         public int DesktopPeriod {
             set => desktopPeriod = value <= 0 || value > 24 ? 24 : value;

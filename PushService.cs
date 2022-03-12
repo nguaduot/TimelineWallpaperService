@@ -383,11 +383,15 @@ namespace TimelineWallpaperService {
             const string URL_TOKEN = "http://m.wufazhuce.com/one";
             const string URL_API = "http://m.wufazhuce.com/one/ajaxlist/{0}?_token={1}";
             HttpClient client = new HttpClient();
-            HttpResponseMessage msg = await client.GetAsync(URL_TOKEN);
+            HttpResponseMessage msg = await client.GetAsync(URL_TOKEN); // cookie 无需手动取，自动包含
             string htmlData = await msg.Content.ReadAsStringAsync();
             Match match = Regex.Match(htmlData, @"One.token ?= ?[""'](.+?)[""']");
             string token = match.Groups[1].Value;
-            string urlApi = string.Format(URL_API, 0, token);
+            string id = "0";
+            if ("random".Equals(ini.One.Order)) {
+                id = (3012 + new Random().Next((DateTime.Now - DateTime.Parse("2020-11-10")).Days)).ToString();
+            }
+            string urlApi = string.Format(URL_API, id, token);
             Log.Information("PushService.LoadOne() api url: " + urlApi);
             string jsonData = await client.GetStringAsync(urlApi);
             match = Regex.Match(jsonData, @"""img_url"": ?""(.+?)""");

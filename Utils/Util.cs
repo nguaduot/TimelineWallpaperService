@@ -109,6 +109,8 @@ namespace TimelineWallpaperService.Utils {
             _ = GetPrivateProfileString("one", "lockperiod", "24", sb, 1024, iniFile);
             _ = int.TryParse(sb.ToString(), out period);
             ini.One.LockPeriod = period;
+            _ = GetPrivateProfileString("one", "order", "date", sb, 1024, iniFile);
+            ini.One.Order = sb.ToString();
             _ = GetPrivateProfileString("infinity", "order", "", sb, 1024, iniFile);
             ini.Infinity.Order = sb.ToString();
             _ = GetPrivateProfileString("3g", "desktopperiod", "24", sb, 1024, iniFile);

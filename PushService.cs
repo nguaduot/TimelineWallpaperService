@@ -311,34 +311,13 @@ namespace TimelineWallpaperService {
         }
 
         private async Task<bool> LoadYmyouli(bool setDesktopOrLock) {
-            const string URL_UHD = "https://27146103.s21i.faiusr.com/2/{0}";
-            const string URL_API = "https://www.ymyouli.com/ajax/ajaxLoadModuleDom_h.jsp";
-            List<string> cols = Enumerable.ToList(YmyouliIni.GetDic().Keys);
-            string col = ini.Ymyouli.Col;
-            if (!cols.Contains(col)) {
-                col = cols[new Random().Next(cols.Count)];
-            }
-            List<string> modules = Enumerable.ToList(YmyouliIni.GetDic()[col].Keys);
-            string module = modules[new Random().Next(modules.Count)];
-            col = YmyouliIni.GetDic()[col][module];
-            Dictionary<string, string> formData = new Dictionary<string, string>() {
-                { "cmd", "getWafNotCk_getAjaxPageModuleInfo" },
-                { "href", string.Format("/col.jsp?id={0}&m{1}pageno=1", col, module) },
-                { "_colId", col },
-                { "moduleId", module }
-            };
-            Log.Information("PushService.LoadYmyouli() api url: " + URL_API);
+            const string URL_API = "https://api.nguaduot.cn/ymyouli?client=timelinewallpaper&cate={0}&order=random&qc={1}";
+            string urlApi = string.Format(URL_API, ini.Ymyouli.Cate, ini.Ymyouli.Qc);
+            Log.Information("PushService.LoadYmyouli() api url: " + urlApi);
             HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("timelinewallpaper",
-                Package.Current.Id.Version.Major + "." + Package.Current.Id.Version.Minor));
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            HttpResponseMessage response = await client.PostAsync(URL_API, new FormUrlEncodedContent(formData));
-            string jsonData = await response.Content.ReadAsStringAsync();
-            List<string> urls = new List<string>();
-            foreach (Match m in Regex.Matches(jsonData, @"""id"": ?""(.+?)""")) {
-                urls.Add(string.Format(URL_UHD, m.Groups[1].Value));
-            }
-            string urlUhd = urls[new Random().Next(urls.Count)];
+            string jsonData = await client.GetStringAsync(urlApi);
+            Match match = Regex.Match(jsonData, @"""imgurl"": ?""(.+?)""");
+            string urlUhd = match.Groups[1].Value;
             Log.Information("PushService.LoadYmyouli() img url: " + urlUhd);
             return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }

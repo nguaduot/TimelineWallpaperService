@@ -329,7 +329,7 @@ namespace TimelineWallpaperService.Utils {
     }
 
     public sealed class YmyouliIni {
-        private readonly HashSet<string> ORDER = new HashSet<string>() { "date", "random" };
+        private readonly HashSet<string> ORDER = new HashSet<string>() { "date", "score", "random" };
         private readonly List<string> CATE = new List<string>() { "", "acgcharacter", "acgscene", "sky",
             "war", "sword", "artistry", "car", "portrait", "animal", "delicacy", "nature" };
 

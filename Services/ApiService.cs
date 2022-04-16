@@ -25,7 +25,7 @@ namespace TimelineWallpaperService.Services {
             StatsApiReq req = new StatsApiReq {
                 App = "拾光推送服务",
                 Package = "TWPushService.winmd",
-                Version = "4.0", // TODO
+                Version = "4.1", // TODO
                 Api = ini?.ToString(),
                 Status = status ? 1 : 0,
                 Os = AnalyticsInfo.VersionInfo.DeviceFamily,

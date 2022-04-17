@@ -11,7 +11,7 @@ using Windows.System.Profile;
 namespace TimelineWallpaperService.Utils {
     public sealed class IniUtil {
         // TODO: 参数有变动时需调整配置名
-        private const string FILE_INI = "timelinewallpaper-4.0.ini";
+        private const string FILE_INI = "timelinewallpaper-4.2.ini";
 
         [DllImport("kernel32")]
         private static extern int GetPrivateProfileString(string section, string key, string defValue,
@@ -116,6 +116,19 @@ namespace TimelineWallpaperService.Utils {
             ini.One.LockPeriod = period;
             _ = GetPrivateProfileString("one", "order", "date", sb, 1024, iniFile);
             ini.One.Order = sb.ToString();
+            _ = GetPrivateProfileString("qingbz", "desktopperiod", "24", sb, 1024, iniFile);
+            _ = int.TryParse(sb.ToString(), out period);
+            ini.Qingbz.DesktopPeriod = period;
+            _ = GetPrivateProfileString("qingbz", "lockperiod", "24", sb, 1024, iniFile);
+            _ = int.TryParse(sb.ToString(), out period);
+            ini.Qingbz.LockPeriod = period;
+            _ = GetPrivateProfileString("qingbz", "order", "", sb, 1024, iniFile);
+            ini.Qingbz.Order = sb.ToString();
+            _ = GetPrivateProfileString("qingbz", "cate", "", sb, 1024, iniFile);
+            ini.Qingbz.Cate = sb.ToString();
+            _ = GetPrivateProfileString("qingbz", "qc", "1", sb, 1024, iniFile);
+            _ = int.TryParse(sb.ToString(), out qc);
+            ini.Qingbz.Qc = qc;
             _ = GetPrivateProfileString("infinity", "order", "", sb, 1024, iniFile);
             ini.Infinity.Order = sb.ToString();
             _ = GetPrivateProfileString("3g", "desktopperiod", "24", sb, 1024, iniFile);
@@ -132,12 +145,6 @@ namespace TimelineWallpaperService.Utils {
             _ = GetPrivateProfileString("bobo", "lockperiod", "24", sb, 1024, iniFile);
             _ = int.TryParse(sb.ToString(), out period);
             ini.Bobo.LockPeriod = period;
-            _ = GetPrivateProfileString("lofter", "desktopperiod", "24", sb, 1024, iniFile);
-            _ = int.TryParse(sb.ToString(), out period);
-            ini.Lofter.DesktopPeriod = period;
-            _ = GetPrivateProfileString("lofter", "lockperiod", "24", sb, 1024, iniFile);
-            _ = int.TryParse(sb.ToString(), out period);
-            ini.Lofter.LockPeriod = period;
             _ = GetPrivateProfileString("abyss", "desktopperiod", "24", sb, 1024, iniFile);
             _ = int.TryParse(sb.ToString(), out period);
             ini.Abyss.DesktopPeriod = period;
@@ -170,12 +177,6 @@ namespace TimelineWallpaperService.Utils {
             ini.Seovx.LockPeriod = period;
             _ = GetPrivateProfileString("seovx", "cate", "d", sb, 1024, iniFile);
             ini.Seovx.Cate = sb.ToString();
-            _ = GetPrivateProfileString("paul", "desktopperiod", "24", sb, 1024, iniFile);
-            _ = int.TryParse(sb.ToString(), out period);
-            ini.Paul.DesktopPeriod = period;
-            _ = GetPrivateProfileString("paul", "lockperiod", "24", sb, 1024, iniFile);
-            _ = int.TryParse(sb.ToString(), out period);
-            ini.Paul.LockPeriod = period;
             return ini;
         }
     }

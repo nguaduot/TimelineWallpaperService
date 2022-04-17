@@ -4,9 +4,9 @@ namespace TimelineWallpaperService.Utils {
     public sealed class Ini {
         private readonly HashSet<string> PROVIDER = new HashSet<string>() {
             BingIni.GetId(), NasaIni.GetId(), OneplusIni.GetId(), TimelineIni.GetId(), Himawari8Ini.GetId(),
-            YmyouliIni.GetId(), InfinityIni.GetId(), OneIni.GetId(), G3Ini.GetId(), BoboIni.GetId(), LofterIni.GetId(),
+            YmyouliIni.GetId(), InfinityIni.GetId(), OneIni.GetId(), QingbzIni.GetId(), G3Ini.GetId(), BoboIni.GetId(),
             AbyssIni.GetId(), DaihanIni.GetId(), DmoeIni.GetId(), ToubiecIni.GetId(), MtyIni.GetId(),
-            SeovxIni.GetId(), PaulIni.GetId()
+            SeovxIni.GetId()
         };
         private readonly HashSet<string> THEME = new HashSet<string>() { "", "light", "dark" };
 
@@ -44,9 +44,9 @@ namespace TimelineWallpaperService.Utils {
 
         public G3Ini G3 { set; get; } = new G3Ini();
 
-        public BoboIni Bobo { set; get; } = new BoboIni();
+        public QingbzIni Qingbz { set; get; } = new QingbzIni();
 
-        public LofterIni Lofter { set; get; } = new LofterIni();
+        public BoboIni Bobo { set; get; } = new BoboIni();
 
         public AbyssIni Abyss { set; get; } = new AbyssIni();
 
@@ -59,8 +59,6 @@ namespace TimelineWallpaperService.Utils {
         public MtyIni Mty { set; get; } = new MtyIni();
 
         public SeovxIni Seovx { set; get; } = new SeovxIni();
-
-        public PaulIni Paul { set; get; } = new PaulIni();
 
         public int GetDesktopPeriod(string provider) {
             if (NasaIni.GetId().Equals(provider)) {
@@ -77,12 +75,12 @@ namespace TimelineWallpaperService.Utils {
                 return Infinity.DesktopPeriod;
             } else if (OneIni.GetId().Equals(provider)) {
                 return One.DesktopPeriod;
+            } else if (QingbzIni.GetId().Equals(provider)) {
+                return Qingbz.DesktopPeriod;
             } else if (G3Ini.GetId().Equals(provider)) {
                 return G3.DesktopPeriod;
             } else if (BoboIni.GetId().Equals(provider)) {
                 return Bobo.DesktopPeriod;
-            } else if (LofterIni.GetId().Equals(provider)) {
-                return Lofter.DesktopPeriod;
             } else if (AbyssIni.GetId().Equals(provider)) {
                 return Abyss.DesktopPeriod;
             } else if (DaihanIni.GetId().Equals(provider)) {
@@ -95,8 +93,6 @@ namespace TimelineWallpaperService.Utils {
                 return Mty.DesktopPeriod;
             } else if (SeovxIni.GetId().Equals(provider)) {
                 return Seovx.DesktopPeriod;
-            } else if (PaulIni.GetId().Equals(provider)) {
-                return Paul.DesktopPeriod;
             } else if (BingIni.GetId().Equals(provider)) {
                 return Bing.DesktopPeriod;
             } else {
@@ -119,12 +115,12 @@ namespace TimelineWallpaperService.Utils {
                 return Infinity.LockPeriod;
             } else if (OneIni.GetId().Equals(provider)) {
                 return One.LockPeriod;
+            } else if (QingbzIni.GetId().Equals(provider)) {
+                return Qingbz.LockPeriod;
             } else if (G3Ini.GetId().Equals(provider)) {
                 return G3.LockPeriod;
             } else if (BoboIni.GetId().Equals(provider)) {
                 return Bobo.LockPeriod;
-            } else if (LofterIni.GetId().Equals(provider)) {
-                return Lofter.LockPeriod;
             } else if (AbyssIni.GetId().Equals(provider)) {
                 return Abyss.LockPeriod;
             } else if (DaihanIni.GetId().Equals(provider)) {
@@ -137,8 +133,6 @@ namespace TimelineWallpaperService.Utils {
                 return Mty.LockPeriod;
             } else if (SeovxIni.GetId().Equals(provider)) {
                 return Seovx.LockPeriod;
-            } else if (PaulIni.GetId().Equals(provider)) {
-                return Paul.LockPeriod;
             } else if (BingIni.GetId().Equals(provider)) {
                 return Bing.LockPeriod;
             } else {
@@ -160,14 +154,14 @@ namespace TimelineWallpaperService.Utils {
                 paras = Infinity.ToString();
             } else if (OneIni.GetId().Equals(provider)) {
                 paras = One.ToString();
+            } else if (QingbzIni.GetId().Equals(provider)) {
+                paras = Qingbz.ToString();
             } else if (Himawari8Ini.GetId().Equals(provider)) {
                 paras = Himawari8.ToString();
             } else if (G3Ini.GetId().Equals(provider)) {
                 paras = G3.ToString();
             } else if (BoboIni.GetId().Equals(provider)) {
                 paras = Bobo.ToString();
-            } else if (LofterIni.GetId().Equals(provider)) {
-                paras = Lofter.ToString();
             } else if (AbyssIni.GetId().Equals(provider)) {
                 paras = Abyss.ToString();
             } else if (DaihanIni.GetId().Equals(provider)) {
@@ -180,8 +174,6 @@ namespace TimelineWallpaperService.Utils {
                 paras = Mty.ToString();
             } else if (SeovxIni.GetId().Equals(provider)) {
                 paras = Seovx.ToString();
-            } else if (PaulIni.GetId().Equals(provider)) {
-                paras = Paul.ToString();
             } else if (BingIni.GetId().Equals(provider)) {
                 paras = Bing.ToString();
             } else {
@@ -416,6 +408,42 @@ namespace TimelineWallpaperService.Utils {
         public static string GetId() => "one";
     }
 
+    public sealed class QingbzIni {
+        private readonly HashSet<string> ORDER = new HashSet<string>() { "date", "score", "random" };
+        private readonly List<string> CATE = new List<string>() { "", "portrait", "acg", "nature",
+            "star", "color", "car", "game", "animal" };
+
+        private string order = "random";
+        public string Order {
+            set => order = ORDER.Contains(value) ? value : "random";
+            get => order;
+        }
+
+        private string cate = "";
+        public string Cate {
+            set => cate = CATE.Contains(value) ? value : "";
+            get => cate;
+        }
+
+        public int Qc { set; get; } = 1;
+
+        private int desktopPeriod = 24;
+        public int DesktopPeriod {
+            set => desktopPeriod = value <= 0 || value > 24 ? 24 : value;
+            get => desktopPeriod;
+        }
+
+        private int lockPeriod = 24;
+        public int LockPeriod {
+            set => lockPeriod = value <= 0 || value > 24 ? 24 : value;
+            get => lockPeriod;
+        }
+
+        override public string ToString() => $"desktopperiod={DesktopPeriod}&lockperiod={LockPeriod}&order={Order}&cate={Cate}&qc={Qc}";
+
+        public static string GetId() => "qingbz";
+    }
+
     public sealed class G3Ini {
         private readonly HashSet<string> ORDER = new HashSet<string>() { "date", "view" };
 
@@ -458,24 +486,6 @@ namespace TimelineWallpaperService.Utils {
         override public string ToString() => $"desktopperiod={DesktopPeriod}&lockperiod={LockPeriod}";
 
         public static string GetId() => "bobo";
-    }
-
-    public sealed class LofterIni {
-        private int desktopPeriod = 24;
-        public int DesktopPeriod {
-            set => desktopPeriod = value <= 0 || value > 24 ? 24 : value;
-            get => desktopPeriod;
-        }
-
-        private int lockPeriod = 24;
-        public int LockPeriod {
-            set => lockPeriod = value <= 0 || value > 24 ? 24 : value;
-            get => lockPeriod;
-        }
-
-        override public string ToString() => $"desktopperiod={DesktopPeriod}&lockperiod={LockPeriod}";
-
-        public static string GetId() => "lofter";
     }
 
     public sealed class AbyssIni {
@@ -592,23 +602,5 @@ namespace TimelineWallpaperService.Utils {
         override public string ToString() => $"desktopperiod={DesktopPeriod}&lockperiod={LockPeriod}&cate={Cate}";
 
         public static string GetId() => "seovx";
-    }
-
-    public sealed class PaulIni {
-        private int desktopPeriod = 24;
-        public int DesktopPeriod {
-            set => desktopPeriod = value <= 0 || value > 24 ? 24 : value;
-            get => desktopPeriod;
-        }
-
-        private int lockPeriod = 24;
-        public int LockPeriod {
-            set => lockPeriod = value <= 0 || value > 24 ? 24 : value;
-            get => lockPeriod;
-        }
-
-        override public string ToString() => $"desktopperiod={DesktopPeriod}&lockperiod={LockPeriod}";
-
-        public static string GetId() => "paul";
     }
 }

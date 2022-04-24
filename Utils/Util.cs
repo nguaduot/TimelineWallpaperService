@@ -11,7 +11,7 @@ using Windows.System.Profile;
 namespace TimelineWallpaperService.Utils {
     public sealed class IniUtil {
         // TODO: 参数有变动时需调整配置名
-        private const string FILE_INI = "timelinewallpaper-4.2.ini";
+        private const string FILE_INI = "timelinewallpaper-4.3.ini";
 
         [DllImport("kernel32")]
         private static extern int GetPrivateProfileString(string section, string key, string defValue,
@@ -99,9 +99,9 @@ namespace TimelineWallpaperService.Utils {
             ini.Ymyouli.Order = sb.ToString();
             _ = GetPrivateProfileString("ymyouli", "cate", "", sb, 1024, iniFile);
             ini.Ymyouli.Cate = sb.ToString();
-            _ = GetPrivateProfileString("ymyouli", "qc", "1", sb, 1024, iniFile);
-            _ = int.TryParse(sb.ToString(), out int qc);
-            ini.Ymyouli.Qc = qc;
+            _ = GetPrivateProfileString("ymyouli", "r18", "0", sb, 1024, iniFile);
+            _ = int.TryParse(sb.ToString(), out int r18);
+            ini.Ymyouli.R18 = r18;
             _ = GetPrivateProfileString("infinity", "desktopperiod", "24", sb, 1024, iniFile);
             _ = int.TryParse(sb.ToString(), out period);
             ini.Infinity.DesktopPeriod = period;
@@ -126,9 +126,22 @@ namespace TimelineWallpaperService.Utils {
             ini.Qingbz.Order = sb.ToString();
             _ = GetPrivateProfileString("qingbz", "cate", "", sb, 1024, iniFile);
             ini.Qingbz.Cate = sb.ToString();
-            _ = GetPrivateProfileString("qingbz", "qc", "1", sb, 1024, iniFile);
-            _ = int.TryParse(sb.ToString(), out qc);
-            ini.Qingbz.Qc = qc;
+            _ = GetPrivateProfileString("qingbz", "r18", "0", sb, 1024, iniFile);
+            _ = int.TryParse(sb.ToString(), out r18);
+            ini.Qingbz.R18 = r18;
+            _ = GetPrivateProfileString("obzhi", "desktopperiod", "24", sb, 1024, iniFile);
+            _ = int.TryParse(sb.ToString(), out period);
+            ini.Obzhi.DesktopPeriod = period;
+            _ = GetPrivateProfileString("obzhi", "lockperiod", "24", sb, 1024, iniFile);
+            _ = int.TryParse(sb.ToString(), out period);
+            ini.Obzhi.LockPeriod = period;
+            _ = GetPrivateProfileString("obzhi", "order", "", sb, 1024, iniFile);
+            ini.Obzhi.Order = sb.ToString();
+            _ = GetPrivateProfileString("obzhi", "cate", "", sb, 1024, iniFile);
+            ini.Obzhi.Cate = sb.ToString();
+            _ = GetPrivateProfileString("obzhi", "r18", "0", sb, 1024, iniFile);
+            _ = int.TryParse(sb.ToString(), out r18);
+            ini.Obzhi.R18 = r18;
             _ = GetPrivateProfileString("infinity", "order", "", sb, 1024, iniFile);
             ini.Infinity.Order = sb.ToString();
             _ = GetPrivateProfileString("3g", "desktopperiod", "24", sb, 1024, iniFile);

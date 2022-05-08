@@ -71,8 +71,8 @@ namespace TimelineWallpaperService {
                         done = await LoadHimawari8(true);
                     } else if (G3Ini.GetId().Equals(ini.DesktopProvider)) {
                         done = await Load3G(true);
-                    } else if (BoboIni.GetId().Equals(ini.DesktopProvider)) {
-                        done = await LoadBobo(true);
+                    } else if (WallhereIni.GetId().Equals(ini.DesktopProvider)) {
+                        done = await LoadWallhere(true);
                     } else if (AbyssIni.GetId().Equals(ini.DesktopProvider)) {
                         done = await LoadAbyss(true);
                     } else if (DaihanIni.GetId().Equals(ini.DesktopProvider)) {
@@ -117,8 +117,8 @@ namespace TimelineWallpaperService {
                         done = await LoadHimawari8(false);
                     } else if (G3Ini.GetId().Equals(ini.LockProvider)) {
                         done = await Load3G(false);
-                    } else if (BoboIni.GetId().Equals(ini.LockProvider)) {
-                        done = await LoadBobo(false);
+                    } else if (WallhereIni.GetId().Equals(ini.LockProvider)) {
+                        done = await LoadWallhere(false);
                     } else if (AbyssIni.GetId().Equals(ini.LockProvider)) {
                         done = await LoadAbyss(false);
                     } else if (DaihanIni.GetId().Equals(ini.LockProvider)) {
@@ -415,19 +415,15 @@ namespace TimelineWallpaperService {
             return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
 
-        private async Task<bool> LoadBobo(bool setDesktopOrLock) {
-            const string URL_API = "https://bobopic.com/category/4k/page/{0}";
-            const string URL_UHD = "https://dl.bobopic.com/tu/{0}{1}";
-            string urlApi = string.Format(URL_API, new Random().Next(1, 40));
-            Log.Information("PushService.LoadBobo() api url: " + urlApi);
+        private async Task<bool> LoadWallhere(bool setDesktopOrLock) {
+            const string URL_API = "https://api.nguaduot.cn/wallhere?client=timelinewallpaper&order=random&cate={0}&r18=0";
+            string urlApi = string.Format(URL_API, ini.Wallhere.Cate);
+            Log.Information("PushService.LoadWallhere() api url: " + urlApi);
             HttpClient client = new HttpClient();
-            string htmlData = await client.GetStringAsync(urlApi);
-            List<string> urls = new List<string>();
-            foreach (Match m in Regex.Matches(htmlData, @"srcset=""([^""]+/small/(\d+)(\.[^""]+))""")) {
-                urls.Add(string.Format(URL_UHD, m.Groups[2].Value, m.Groups[3].Value));
-            }
-            string urlUhd = urls[new Random().Next(urls.Count)];
-            Log.Information("PushService.LoadBobo() img url: " + urlUhd);
+            string jsonData = await client.GetStringAsync(urlApi);
+            Match match = Regex.Match(jsonData, @"""imgurl"": ?""(.+?)""");
+            string urlUhd = match.Groups[1].Value;
+            Log.Information("PushService.LoadWallhere() img url: " + urlUhd);
             return await SetWallpaper(urlUhd, setDesktopOrLock, new Size(), 0);
         }
 
